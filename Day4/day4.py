@@ -8,18 +8,14 @@ def verify(x):
         if(x[0][i] == x[1][i] == x[2][i] == x[3][i] == x[4][i] == '*'): return 1
     return 0
 
-def part1(lines):
-    bingoNumbers = lines[0].strip().split(','); bingoNumber = 0; bingoCards = []
-    for i in range(2, len(lines), 6): bingoCards.append([lines[i + k].strip().split(' ') for k in range(0,5)])
+def part1(bingoNumbers, bingoCards):
     for bingoNumber in range(0, len(bingoNumbers)): 
         for x in bingoCards:
             for i in range(0, len(x)):
                 x[i] = ['*' if x[i][k] == bingoNumbers[bingoNumber] else x[i][k] for k in range(0, len(x[i]))]
             if(verify(x)): print(result(x)*int(bingoNumbers[bingoNumber])); return
 
-def part2(lines):
-    bingoNumbers = lines[0].strip().split(','); bingoNumber = 0; bingoCards = []; toRemove = []
-    for i in range(2, len(lines), 6): bingoCards.append([lines[i + k].strip().split(' ') for k in range(0,5)])
+def part2(bingoNumbers, bingoCards, toRemove):
     for bingoNumber in range(0, len(bingoNumbers)): 
         for x in bingoCards:
             for i in range(0, len(x)):
@@ -31,6 +27,8 @@ def part2(lines):
 def main():
     f = open("input.txt", "r")
     lines = f.readlines()
-    part1(lines)
-    part2(lines)
+    bingoNumbers = lines[0].strip().split(','); bingoCards = []
+    for i in range(2, len(lines), 6): bingoCards.append([lines[i + k].strip().split(' ') for k in range(0,5)])
+    part1(bingoNumbers, bingoCards)
+    part2(bingoNumbers, bingoCards, [])
 main()
