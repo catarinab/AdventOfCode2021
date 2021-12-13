@@ -39,6 +39,7 @@ def main():
     g = Graph()
     for i in input:
         g.addEdge(i[0], i[1])
+        g.addEdge(i[1], i[0])
     g.setVertices()
     g.printPaths("start", "end")
 main()
