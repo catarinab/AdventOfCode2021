@@ -1,57 +1,49 @@
-from queue import PriorityQueue
+from collections import defaultdict
+import heapq as heap
 
-def dist(x, y, xIndex, yIndex):
-    return (((((x - xIndex )**2) + ((y-yIndex)**2) )**0.5) == 1)
+def validRange(vertice, lineSize):
+    if(vertice%lineSize != 0 and vertice%lineSize != lineSize-1):
+        return [vertice-1, vertice+1, vertice-lineSize, vertice+lineSize]
+    elif(vertice%lineSize == 0):
+        return [vertice+1, vertice-lineSize, vertice+lineSize]
+    return [vertice-1, vertice-lineSize, vertice+lineSize]
 
-def validRange(x, y, xIndex, yIndex, input):
-    return (0 <= xIndex < len(input) and 0  <= yIndex < len(input[x]) and dist(x, y, xIndex, yIndex))
+def buildGraph(input):
+    G = [{}]*(len(input)**2)
+    for vertice in range(len(input)**2):
+        G[vertice] = {}
+        for item in validRange(vertice, len(input)):
+            if(0 <= item < len(input)**2):
+                G[vertice][item] = input[item//len(input)][item%len(input)]
+    return G
 
-class Graph:
-    def __init__(self, num_of_vertices):
-        self.v = num_of_vertices
-        self.edges = [[-1 for i in range(num_of_vertices)] for j in range(num_of_vertices)]
-        self.visited = []
-    
-    def add_edge(self, x, y, index, input):
-        for xIndex in range(x-1, x+2):
-            for yIndex in range(y-1, y+2):
-                if(validRange(x, y, xIndex, yIndex, input)):
-                    newIndex = len(input[0])*xIndex + yIndex
-                    if(index > newIndex):
-                        self.edges[newIndex][index] = input[x][y]
 
-def dijkstra(graph, startVertex):
-    print(graph.edges[16][15], graph.edges[15][16])
-    D = {v:float('inf') for v in range(graph.v)}
-    D[startVertex] = 0
-
-    pq = PriorityQueue()
-    pq.put((0, startVertex))
-
-    while not pq.empty():
-        (dist, currentVertex) = pq.get()
-        graph.visited.append(currentVertex)
-        print(currentVertex)
-
-        for neighbor in range(graph.v):
-            if graph.edges[currentVertex][neighbor] != -1:
-                distance = graph.edges[currentVertex][neighbor]
-                if neighbor not in graph.visited:
-                    newCost = min(D[neighbor], D[currentVertex] + distance)
-                    pq.put((newCost, neighbor))
-                    if (currentVertex == 16): 
-                        print(currentVertex, neighbor)
-                    D[neighbor] = newCost
-    return D
+def dijkstra(G, startingNode):
+	visited = set()
+	parentsMap = {}
+	pq = []
+	nodeCosts = defaultdict(lambda: float('inf'))
+	nodeCosts[startingNode] = 0
+	heap.heappush(pq, (0, startingNode))
+ 
+	while pq:
+		_, node = heap.heappop(pq)
+		visited.add(node)
+ 
+		for adjNode, weight in G[node].items():
+			if adjNode in visited:	continue
+				
+			newCost = nodeCosts[node] + weight
+			if nodeCosts[adjNode] > newCost:
+				parentsMap[adjNode] = node
+				nodeCosts[adjNode] = newCost
+				heap.heappush(pq, (newCost, adjNode))
+        
+	return parentsMap, nodeCosts
 
 def main():
-    input = open("inputtest.txt", "r").readlines()
-    for i in range(len(input)): input[i] = [int(item) for item in input[i].strip()]
-    g = Graph(len(input) * len(input[0]))
-    for xIndex in range(len(input)):
-        for yIndex in range(len(input[xIndex])): g.add_edge(xIndex, yIndex, len(input[0])*xIndex + yIndex, input)
-    D = dijkstra(g, 0)
-    print(D)
-    #print(D[list(D.keys())[-1]])
+    graph = open("input.txt", "r").readlines();
+    for i in range(len(graph)): graph[i] = [int(item) for item in graph[i].strip()]
+    print(dijkstra(buildGraph(graph), 0)[1][len(graph)**2-1]) #part1
 main()
 
