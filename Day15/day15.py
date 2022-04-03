@@ -81,4 +81,3 @@ def main():
 	expandedGraph = expandGraph(input)
 	print("part 2: ", dijkstra(buildGraph(expandedGraph), 0)[1][len(expandedGraph)**2-1])
 main()
-
